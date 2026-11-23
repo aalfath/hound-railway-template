@@ -31,6 +31,8 @@ if [ -r /sys/fs/cgroup/memory.max ]; then
   [ "$m" != "max" ] && mem_mb=$(( m / 1048576 ))
 fi
 export GOMAXPROCS="${GOMAXPROCS:-$cpus}"
+# Railway hosts run transparent huge pages "always", which inflates the Go heap's RSS.
+export GODEBUG="${GODEBUG:-disablethp=1}"
 # Soft Go heap limit at ~70% of the container limit, so GC works harder before an OOM kill.
 if [ -z "${GOMEMLIMIT:-}" ] && [ "$mem_mb" -gt 0 ]; then
   export GOMEMLIMIT="$(( mem_mb * 70 / 100 ))MiB"
@@ -38,7 +40,7 @@ fi
 if [ -z "${HOUND_MAX_INDEXERS:-}" ]; then
   if [ "$mem_mb" -gt 0 ] && [ "$mem_mb" -lt 1500 ]; then HOUND_MAX_INDEXERS=1; else HOUND_MAX_INDEXERS=2; fi
 fi
-log "cpus=$cpus mem_limit_mb=${mem_mb:-unlimited} GOMAXPROCS=$GOMAXPROCS GOMEMLIMIT=${GOMEMLIMIT:-none} indexers=$HOUND_MAX_INDEXERS"
+log "cpus=$cpus mem_limit_mb=${mem_mb:-unlimited} GOMAXPROCS=$GOMAXPROCS GOMEMLIMIT=${GOMEMLIMIT:-none} GODEBUG=$GODEBUG indexers=$HOUND_MAX_INDEXERS"
 
 # --- Git: low-memory settings for clones and fetches -----------------------------
 git config --global pack.threads 1

@@ -9,3 +9,4 @@ First release of the Railway template.
 - Repos from `HOUND_REPOS` (comma-separated, optional `#branch`), or a full `HOUND_CONFIG`; index and clones on the `/data` volume.
 - Optional `GITHUB_TOKEN` for private GitHub repos, passed through a git credential helper.
 - Exits non-zero when Hound or Caddy stops, so Railway restarts it.
+- Go heap without transparent huge pages (`GODEBUG=disablethp=1`) and a soft memory limit at 70% of the container limit.

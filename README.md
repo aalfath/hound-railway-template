@@ -31,7 +31,7 @@ Optional, not in the template (add them to the service if you need them):
 
 ## Resources
 
-The start script sizes Hound to the container: `GOMAXPROCS` from the CPU limit, a Go soft memory limit (`GOMEMLIMIT`) at 70% of the memory limit, one indexer below 1.5 GB, and low-memory Git settings for clones. Tested at **0.5 GB RAM / 1 vCPU** (Railway's Free plan): indexing the whole Linux kernel (1.7 GB of source, 2.9 GB on disk) peaked at about 320 MB of process memory with no OOM kill. The volume needs roughly 1.5–2× the size of the code you index.
+The start script sizes Hound to the container: `GOMAXPROCS` from the CPU limit, a Go soft memory limit (`GOMEMLIMIT`) at 70% of the memory limit, no transparent huge pages for the Go heap (`GODEBUG=disablethp=1`), one indexer below 1.5 GB, and low-memory Git settings for clones. Tested at **0.5 GB RAM / 1 vCPU** (Railway's Free plan): indexing the whole Linux kernel (1.7 GB of source, 2.9 GB on disk) peaked at about 320 MB of process memory with no OOM kill. The volume needs roughly 1.5–2× the size of the code you index.
 
 If Hound or Caddy stops, the container exits non-zero so Railway's restart policy brings it back.
 
