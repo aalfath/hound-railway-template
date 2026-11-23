@@ -1,0 +1,20 @@
+{
+	admin off
+	auto_https off
+	persist_config off
+}
+
+:{$PORT:8080} {
+	# Railway health check: answered by Hound itself, no login needed.
+	handle /healthz {
+		reverse_proxy 127.0.0.1:6080
+	}
+
+	# Everything else (web UI and /api/v1/*) needs the generated login.
+	handle {
+		basic_auth {
+			{$HOUND_USERNAME} {$HOUND_PASSWORD_HASH}
+		}
+		reverse_proxy 127.0.0.1:6080
+	}
+}
