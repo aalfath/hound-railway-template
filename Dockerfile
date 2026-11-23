@@ -18,8 +18,10 @@ RUN set -eux; \
 
 FROM caddy:2.11.9-alpine@sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0 AS caddy
 
-FROM alpine:3.24.4@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf
-RUN apk add --no-cache git openssh-client ca-certificates tini jq
+FROM debian:trixie-20261104-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends git openssh-client ca-certificates tini jq \
+ && rm -r /var/lib/apt/lists/*
 COPY --from=build /out/houndd /usr/local/bin/houndd
 COPY --from=caddy /usr/bin/caddy /usr/local/bin/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
@@ -27,4 +29,4 @@ COPY start.sh /usr/local/bin/start.sh
 RUN chmod 755 /usr/local/bin/start.sh && mkdir -p /data /etc/hound
 ENV PORT=8080 HOME=/root
 EXPOSE 8080
-ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/start.sh"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/start.sh"]
